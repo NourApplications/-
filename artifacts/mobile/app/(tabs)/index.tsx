@@ -199,7 +199,6 @@ export default function MainScreen() {
                       >
                         <Text
                           numberOfLines={1}
-                          adjustsFontSizeToFit
                           style={[
                             styles.segBtnText,
                             { color: isActive ? primaryC : mutedC },
@@ -405,7 +404,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     paddingHorizontal: 20,
-    marginTop: 2,
+    marginTop: 0,
     marginBottom: 6,
   },
   pinBtnWide: {
