@@ -1,0 +1,77 @@
+{
+  "expo": {
+    "name": "أذكار الصباح والمساء",
+    "slug": "adhkar-morning-evening",
+    "version": "1.0.0",
+    "orientation": "default",
+    "icon": "./assets/images/icon.png",
+    "scheme": "adhkar",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#FFFFFF"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.adhkar.morningevening",
+      "buildNumber": "66"
+    },
+    "android": {
+      "package": "com.adhkar.morningevening",
+      "versionCode": 87,
+      "resizeableActivity": true,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "permissions": [
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.VIBRATE",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ],
+      "enableProguardInReleaseBuilds": true,
+      "enableShrinkResourcesInReleaseBuilds": true
+    },
+    "web": {
+      "favicon": "./assets/images/icon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-web-browser",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#FFFFFF",
+          "image": "./assets/images/splash-blank.png",
+          "imageWidth": 1
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/notification-icon.png",
+          "defaultChannel": "adhkar"
+        }
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": "يحتاج التطبيق إلى الميكروفون لتسجيل صوتك مع الأذكار"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "d5a08fbc-ddec-4bca-9543-b4a8067050e3"
+      }
+    },
+    "owner": "amrmohamed1982"
+  }
+}

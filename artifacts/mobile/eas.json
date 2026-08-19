@@ -1,0 +1,55 @@
+{
+  "cli": {
+    "version": ">= 12.0.0",
+    "appVersionSource": "local"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "gradleCommand": ":app:assembleRelease -Pandroid.abiFilter=arm64-v8a",
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_NO_TELEMETRY": "1",
+        "EXPO_PUBLIC_DOMAIN": "azkar-reader-1.replit.app"
+      }
+    },
+    "preview-universal": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "production": {
+      "android": {
+        "buildType": "app-bundle"
+      },
+      "ios": {
+        "buildConfiguration": "Release"
+      },
+      "env": {
+        "EXPO_NO_TELEMETRY": "1",
+        "EXPO_PUBLIC_DOMAIN": "azkar-reader-1.replit.app"
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "android": {
+        "serviceAccountKeyPath": "./google-play-key.json",
+        "track": "internal"
+      },
+      "ios": {
+        "language": "ar-SA"
+      }
+    }
+  }
+}

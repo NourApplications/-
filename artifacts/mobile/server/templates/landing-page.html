@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <title>أذكار الصباح والمساء | تطبيق أذكار يومية للمسلمين</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="تطبيق أذكار الصباح والمساء — أذكارك اليومية بين يديك. استمع للأذكار، تابع تقدمك، واستقبل تذكيرات الصباح والمساء." />
+    <link rel="canonical" href="BASE_URL_PLACEHOLDER/" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg width='180' height='180' viewBox='0 0 180 180' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='180' height='180' rx='36' fill='%232E7D32'/%3E%3Ctext x='90' y='120' font-size='90' text-anchor='middle' fill='white'%3E%D8%B0%3C/text%3E%3C/svg%3E" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="أذكار الصباح والمساء" />
+    <meta property="og:description" content="تطبيق أذكار الصباح والمساء — أذكارك اليومية بين يديك. استمع للأذكار، تابع تقدمك، واستقبل تذكيرات الصباح والمساء." />
+    <meta property="og:url" content="BASE_URL_PLACEHOLDER/" />
+    <meta property="og:locale" content="ar_AR" />
+    <meta property="og:image" content="BASE_URL_PLACEHOLDER/icon.png" />
+    <meta property="og:image:alt" content="أذكار الصباح والمساء" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="أذكار الصباح والمساء" />
+    <meta name="twitter:description" content="تطبيق أذكار الصباح والمساء — أذكارك اليومية بين يديك. استمع للأذكار، تابع تقدمك، واستقبل تذكيرات الصباح والمساء." />
+    <meta name="twitter:image" content="BASE_URL_PLACEHOLDER/icon.png" />
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "أذكار الصباح والمساء",
+      "applicationCategory": "LifestyleApplication",
+      "operatingSystem": "Android, iOS",
+      "inLanguage": "ar",
+      "description": "تطبيق أذكار الصباح والمساء لمتابعة أذكارك اليومية، مع إمكانية الاستماع للأذكار بالصوت، وتتبع التقدم، وتذكيرات الصباح والمساء.",
+      "image": "BASE_URL_PLACEHOLDER/icon.png",
+      "installUrl": "https://play.google.com/store/apps/details?id=com.adhkar.morningevening",
+      "identifier": [
+        {
+          "@type": "PropertyValue",
+          "propertyID": "android_package",
+          "value": "com.adhkar.morningevening"
+        },
+        {
+          "@type": "PropertyValue",
+          "propertyID": "ios_bundle_id",
+          "value": "com.adhkar.morningevening"
+        }
+      ],
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans Arabic", sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #fff;
+        color: #222;
+        line-height: 1.7;
+      }
+
+      /* Hero */
+      .hero {
+        background: linear-gradient(160deg, #1b5e20 0%, #2e7d32 60%, #388e3c 100%);
+        color: #fff;
+        text-align: center;
+        padding: 64px 24px 56px;
+      }
+      .hero-icon {
+        width: 96px;
+        height: 96px;
+        border-radius: 22px;
+        background: rgba(255,255,255,0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 52px;
+        margin: 0 auto 24px;
+        border: 2px solid rgba(255,255,255,0.25);
+      }
+      .hero h1 {
+        font-size: 32px;
+        font-weight: 700;
+        margin: 0 0 14px;
+        letter-spacing: -0.5px;
+      }
+      .hero p {
+        font-size: 17px;
+        color: rgba(255,255,255,0.85);
+        max-width: 480px;
+        margin: 0 auto 32px;
+      }
+      .store-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: center;
+      }
+      .store-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 11px 20px;
+        background: rgba(255,255,255,0.12);
+        border: 1px solid rgba(255,255,255,0.3);
+        border-radius: 10px;
+        color: #fff;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: background 0.15s;
+      }
+      .store-badge:hover {
+        background: rgba(255,255,255,0.22);
+      }
+      .store-badge--soon {
+        opacity: 0.55;
+        cursor: default;
+        pointer-events: none;
+      }
+      .store-badge svg {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+      }
+
+      /* Features */
+      .features {
+        padding: 56px 24px;
+        max-width: 860px;
+        margin: 0 auto;
+      }
+      .features h2 {
+        text-align: center;
+        font-size: 24px;
+        font-weight: 700;
+        margin: 0 0 40px;
+        color: #111;
+      }
+      .features-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      .feature-card {
+        padding: 24px;
+        border: 1px solid #e8e8e8;
+        border-radius: 14px;
+        background: #fafafa;
+      }
+      .feature-icon {
+        font-size: 32px;
+        margin-bottom: 12px;
+        display: block;
+      }
+      .feature-card h3 {
+        font-size: 17px;
+        font-weight: 600;
+        margin: 0 0 8px;
+        color: #111;
+      }
+      .feature-card p {
+        font-size: 14px;
+        color: #555;
+        margin: 0;
+      }
+
+      /* About section */
+      .about {
+        background: #f4f8f4;
+        padding: 48px 24px;
+        text-align: center;
+      }
+      .about-inner {
+        max-width: 620px;
+        margin: 0 auto;
+      }
+      .about h2 {
+        font-size: 22px;
+        font-weight: 700;
+        color: #1b5e20;
+        margin: 0 0 16px;
+      }
+      .about p {
+        font-size: 15px;
+        color: #444;
+        margin: 0;
+      }
+
+      /* Footer */
+      footer {
+        padding: 28px 24px;
+        text-align: center;
+        font-size: 13px;
+        color: #999;
+        border-top: 1px solid #eee;
+      }
+      footer a {
+        color: inherit;
+        text-underline-offset: 2px;
+      }
+
+      @media (min-width: 600px) {
+        .features-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .hero h1 {
+          font-size: 40px;
+        }
+      }
+
+      @media (min-width: 900px) {
+        .features-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+
+      /* Dark mode */
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: #0d0d0d;
+          color: #e0e0e0;
+        }
+        .feature-card {
+          border-color: #2a2a2a;
+          background: #161616;
+        }
+        .feature-card h3 {
+          color: #f0f0f0;
+        }
+        .feature-card p {
+          color: #888;
+        }
+        .features h2 {
+          color: #f0f0f0;
+        }
+        .about {
+          background: #111;
+        }
+        .about h2 {
+          color: #66bb6a;
+        }
+        .about p {
+          color: #888;
+        }
+        footer {
+          border-color: #222;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="hero">
+        <div class="hero-icon" role="img" aria-label="أذكار الصباح والمساء">🌿</div>
+        <h1>أذكار الصباح والمساء</h1>
+        <p>أذكارك اليومية في متناول يدك — استمع، تابع تقدمك، واحرص على ورد الصباح والمساء.</p>
+        <div class="store-badges">
+          <span class="store-badge store-badge--soon" aria-label="App Store — قريباً">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+            </svg>
+            App Store — قريباً
+          </span>
+          <a
+            href="https://play.google.com/store/apps/details?id=com.adhkar.morningevening"
+            class="store-badge"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="تحميل من Google Play"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/>
+            </svg>
+            Google Play
+          </a>
+        </div>
+      </section>
+
+      <section class="features" aria-labelledby="features-heading">
+        <h2 id="features-heading">مميزات التطبيق</h2>
+        <div class="features-grid">
+          <div class="feature-card">
+            <span class="feature-icon" aria-hidden="true">📿</span>
+            <h3>أذكار الصباح والمساء</h3>
+            <p>جميع أذكار الصباح والمساء المأثورة بنصوصها الكاملة وعدد مراتها.</p>
+          </div>
+          <div class="feature-card">
+            <span class="feature-icon" aria-hidden="true">🎙️</span>
+            <h3>الاستماع بالصوت</h3>
+            <p>استمع إلى الأذكار بصوت واضح، أو سجّل صوتك الخاص للمرافقة أثناء القراءة.</p>
+          </div>
+          <div class="feature-card">
+            <span class="feature-icon" aria-hidden="true">✅</span>
+            <h3>تتبع التقدم</h3>
+            <p>يحفظ التطبيق تقدمك تلقائياً حتى تعرف دائماً أين توقفت.</p>
+          </div>
+          <div class="feature-card">
+            <span class="feature-icon" aria-hidden="true">🔔</span>
+            <h3>تذكيرات يومية</h3>
+            <p>اضبط تنبيهات الصباح والمساء لتحرص على قراءة أذكارك في وقتها.</p>
+          </div>
+          <div class="feature-card">
+            <span class="feature-icon" aria-hidden="true">🌙</span>
+            <h3>وضع الليل</h3>
+            <p>يدعم التطبيق الوضع الليلي تلقائياً لراحة عينيك عند القراءة ليلاً.</p>
+          </div>
+          <div class="feature-card">
+            <span class="feature-icon" aria-hidden="true">📵</span>
+            <h3>يعمل بلا إنترنت</h3>
+            <p>جميع الأذكار محفوظة على جهازك — لا حاجة لاتصال بالإنترنت.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="about" aria-labelledby="about-heading">
+        <div class="about-inner">
+          <h2 id="about-heading">عن التطبيق</h2>
+          <p>
+            تطبيق أذكار الصباح والمساء مصمَّم لمساعدة المسلمين على المداومة على أذكارهم اليومية بيسر وسهولة.
+            يجمع التطبيق بين النص والصوت وتتبع التقدم في واجهة بسيطة وسريعة، متاح لأجهزة iOS وAndroid مجاناً.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <a href="/privacy">سياسة الخصوصية</a>
+    </footer>
+  </body>
+</html>
