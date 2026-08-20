@@ -155,7 +155,7 @@ export default function MainScreen() {
       : insets.bottom + 16;
 
   return (
-    <View style={[styles.root, { backgroundColor: theme === "day" ? "#FFFFFF" : "#000000", paddingTop: insets.top }]}>
+    <View style={[styles.root, { backgroundColor: theme === "day" ? "#FFFFFF" : "#000000" }]}>
       <View style={{ overflow: "hidden" }}>
         <Animated.View style={{ height: headerHeight, overflow: "hidden" }}>
           <View
@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     paddingHorizontal: 20,
-    marginTop: 0,
+    marginTop: 4,
     marginBottom: 6,
   },
   pinBtnWide: {
