@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { setStatusBarHidden } from "expo-status-bar";
 import {
   ActivityIndicator,
   Alert,
@@ -106,6 +107,10 @@ export default function MainScreen() {
       duration: 300,
       useNativeDriver: false,
     }).start();
+    // Collapsing: hide the status bar so the pin button can sit flush at the
+    // very top without anything (network/battery icons) behind it to
+    // overlap or intercept its touches. Expanding: bring it back.
+    setStatusBarHidden(!headerCollapsed, "fade");
     setHeaderCollapsed(!headerCollapsed);
   };
 
@@ -404,7 +409,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     paddingHorizontal: 20,
-    marginTop: 10,
+    marginTop: 8,
     marginBottom: 6,
   },
   pinBtnWide: {
