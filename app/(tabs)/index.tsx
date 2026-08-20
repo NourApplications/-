@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     paddingHorizontal: 20,
-    marginTop: 4,
+    marginTop: 10,
     marginBottom: 6,
   },
   pinBtnWide: {
