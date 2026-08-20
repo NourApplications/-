@@ -20,7 +20,7 @@
     },
     "android": {
       "package": "com.adhkar.morningevening",
-      "versionCode": 89,
+      "versionCode": 90,
       "resizeableActivity": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
