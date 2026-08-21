@@ -809,30 +809,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const playNextRef = useRef<(() => void) | null>(null);
   const cardSoundRef = useRef<Audio.Sound | null>(null);
   const playbackGenRef = useRef(0);
-  const arabicVoiceRef = useRef<string | undefined>(undefined);
-  const arabicVoiceChecked = useRef(false);
 
   const getArabicVoice = async (): Promise<string | undefined> => {
     // User-selected voice takes priority over auto-pick
     if (settings.selectedVoiceIdentifier != null) {
       return settings.selectedVoiceIdentifier;
     }
-    if (arabicVoiceChecked.current) return arabicVoiceRef.current;
-    arabicVoiceChecked.current = true;
-    try {
-      const voices = await Speech.getAvailableVoicesAsync();
-      // Collect all Arabic voices and sort by identifier for consistent ordering
-      // matching the Android TTS UI order (الصوت I, II, III, IV …)
-      const arVoices = voices
-        .filter((v) => v.language.startsWith("ar"))
-        .sort((a, b) => a.identifier.localeCompare(b.identifier));
-      // Prefer الصوت III → II → I (الصوت I is typically female on Google TTS)
-      const picked = arVoices[2] ?? arVoices[1] ?? arVoices[0];
-      arabicVoiceRef.current = picked?.identifier;
-    } catch {
-      arabicVoiceRef.current = undefined;
-    }
-    return arabicVoiceRef.current;
+    // No in-app selection: don't guess. Leaving voice undefined makes
+    // Speech.speak() use the OS's own currently-selected default TTS voice
+    // for the language — i.e. whatever the user already chose in Android's
+    // own Text-to-speech settings. Picking an index out of
+    // Speech.getAvailableVoicesAsync() (sorted alphabetically by
+    // identifier) is not reliable: that order does not necessarily match
+    // the "الصوت I / II / III / IV" order shown in Android's TTS voice
+    // picker, so an index-based guess can silently land on the wrong voice.
+    return undefined;
   };
   // Tracks the date of the last completed reset so we can detect a day change
   // while the app is backgrounded and re-foregrounded (the cold-launch reset
