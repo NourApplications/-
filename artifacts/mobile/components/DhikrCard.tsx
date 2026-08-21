@@ -28,7 +28,8 @@ export function DhikrCard({ item, onEdit, onFadeComplete }: Props) {
   const drag = useReorderableDrag();
 
   const handleShare = () => {
-    Share.share({ message: item.text }).catch(() => {});
+    const message = `━━━━━━━━━━━━━━━━━━━━━━\n\n( ${item.text} )\n\n━━━━━━━━━━━━━━━━━━━━━━\n📲 حمّل التطبيق:\nhttps://play.google.com/store/apps/details?id=com.adhkar.morningevening`;
+    Share.share({ message }).catch(() => {});
   };
 
   const cardC = CARD_COLORS[theme][bgColor];
@@ -448,7 +449,7 @@ const styles = StyleSheet.create({
   },
   dragHandle: {
     position: "absolute",
-    top: 6,
+    top: 2,
     right: 6,
     zIndex: 5,
     padding: 4,
