@@ -1,4 +1,5 @@
 import React from "react";
+import { View, type ViewStyle, type StyleProp } from "react-native";
 import Svg, {
   Circle,
   Line,
@@ -11,6 +12,7 @@ interface IconProps {
   name: IconName;
   size?: number;
   color?: string;
+  style?: StyleProp<ViewStyle>;
 }
 
 export type IconName =
@@ -44,9 +46,16 @@ export type IconName =
   | "printer"
   | "send"
   | "gift"
-  | "pin";
+  | "pin"
+  | "more-vertical";
 
-export function Icon({ name, size = 24, color = "#000" }: IconProps) {
+export function Icon({ name, size = 24, color = "#000", style }: IconProps) {
+  const element = renderIconSvg(name, size, color);
+  if (!style) return element;
+  return <View style={style}>{element}</View>;
+}
+
+function renderIconSvg(name: IconName, size: number, color: string) {
   const s = { stroke: color, strokeWidth: "2", strokeLinecap: "round" as const, strokeLinejoin: "round" as const, fill: "none" };
 
   switch (name) {
@@ -309,6 +318,15 @@ export function Icon({ name, size = 24, color = "#000" }: IconProps) {
         <Svg width={size} height={size} viewBox="0 0 24 24">
           <Circle cx="12" cy="8" r="5" fill={color} stroke="none" />
           <Path d="M12 13 L12 22 L14 15 Z" fill={color} stroke="none" />
+        </Svg>
+      );
+
+    case "more-vertical":
+      return (
+        <Svg width={size} height={size} viewBox="0 0 24 24">
+          <Circle cx="12" cy="5" r="1.6" fill={color} stroke="none" />
+          <Circle cx="12" cy="12" r="1.6" fill={color} stroke="none" />
+          <Circle cx="12" cy="19" r="1.6" fill={color} stroke="none" />
         </Svg>
       );
 

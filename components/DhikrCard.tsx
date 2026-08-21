@@ -13,6 +13,7 @@ import {
 import { BUNDLED_AUDIO, CARD_COLORS, TEXT_COLORS, useApp } from "@/context/AppContext";
 import type { Dhikr } from "@/context/AppContext";
 import { Icon } from "@/components/Icon";
+import { useReorderableDrag } from "react-native-reorderable-list";
 
 interface Props {
   item: Dhikr;
@@ -23,6 +24,7 @@ interface Props {
 export function DhikrCard({ item, onEdit, onFadeComplete }: Props) {
   const { settings, decrementCount, recordings, saveRecording, deleteRecording, speakDhikr, speakingId, stopDhikrSpeech, stopAllAudio, registerCardSound, getPlaybackGen, playingCardId, setPlayingCardId } = useApp();
   const { theme, bgColor, fontSize } = settings;
+  const drag = useReorderableDrag();
 
   const cardC = CARD_COLORS[theme][bgColor];
   const textC = TEXT_COLORS[theme];
@@ -290,6 +292,15 @@ export function DhikrCard({ item, onEdit, onFadeComplete }: Props) {
           },
         ]}
       >
+        <TouchableOpacity
+          onLongPress={drag}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          style={styles.dragHandle}
+          activeOpacity={0.5}
+        >
+          <Icon name="more-vertical" size={18} color={mutedC} />
+        </TouchableOpacity>
+
         <Text
           selectable={false}
           style={[
@@ -422,6 +433,13 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     overflow: "hidden",
     position: "relative",
+  },
+  dragHandle: {
+    position: "absolute",
+    top: 6,
+    left: 6,
+    zIndex: 5,
+    padding: 4,
   },
   dhikrText: {
     fontFamily: Platform.OS === "ios" ? "System" : undefined,
