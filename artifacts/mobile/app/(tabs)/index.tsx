@@ -287,7 +287,7 @@ export default function MainScreen() {
               <DhikrCard
                 item={item}
                 onEdit={handleEdit}
-                onComplete={() => {
+                onFadeComplete={() => {
                   // Calculate this card's top offset in the list (hidden items contribute 0).
                   const idx = all.findIndex((d) => d.id === item.id);
                   const cardTop = all
