@@ -3,11 +3,8 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
   Animated,
-  Easing,
-  LayoutAnimation,
   Platform,
   Pressable,
-  Share,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -21,11 +18,11 @@ import { useReorderableDrag } from "react-native-reorderable-list";
 interface Props {
   item: Dhikr;
   onEdit: (item: Dhikr) => void;
-  onComplete?: () => void;
+  onFadeComplete?: (id: string) => void;
 }
 
-export function DhikrCard({ item, onEdit, onComplete }: Props) {
-  const { settings, decrementCount, recordings, saveRecording, deleteRecording, speakDhikr, speakingId, stopDhikrSpeech, stopAllAudio, registerCardSound, getPlaybackGen, playingCardId, setPlayingCardId, isPlayingAll, skipCurrentInSpeakAll } = useApp();
+export function DhikrCard({ item, onEdit, onFadeComplete }: Props) {
+  const { settings, decrementCount, recordings, saveRecording, deleteRecording, speakDhikr, speakingId, stopDhikrSpeech, stopAllAudio, registerCardSound, getPlaybackGen, playingCardId, setPlayingCardId } = useApp();
   const { theme, bgColor, fontSize } = settings;
   const drag = useReorderableDrag();
 
@@ -39,17 +36,12 @@ export function DhikrCard({ item, onEdit, onComplete }: Props) {
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const fadeAnim = useRef(new Animated.Value(1)).current;
-  // Web-only: maxHeight animation — starts at measured card height so collapse begins immediately
-  const maxHeightAnim = useRef(new Animated.Value(600)).current;
-  const cardHeightRef = useRef(600);
-
   const isDone = item.currentCount === 0;
   const hasBundledAudio = !!BUNDLED_AUDIO[item.id];
   const hasUserRecording = !!recordings[item.id];
   const hasRecording = hasUserRecording || hasBundledAudio;
 
   const [hidden, setHidden] = useState(isDone);
-  const [isCollapsing, setIsCollapsing] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const prevIsDoneRef = useRef(isDone);
 
@@ -68,16 +60,8 @@ export function DhikrCard({ item, onEdit, onComplete }: Props) {
         soundRef.current = null;
       }
       setIsPlaying(false);
-      // Stop audio on card fade:
-      // - Single-card mode: stop TTS directly.
-      // - SpeakAll mode: stop current audio and advance to next card.
-      if (speakingId === item.id) {
-        if (isPlayingAll) {
-          skipCurrentInSpeakAll();
-        } else {
-          stopDhikrSpeech();
-        }
-      }
+      // Stop TTS if it's currently reading this card
+      if (speakingId === item.id) stopDhikrSpeech();
       // Stop any in-progress recording and save what was captured
       if (isRecording && recordingRef.current) {
         const recUri = recordingRef.current.getURI();
@@ -86,61 +70,18 @@ export function DhikrCard({ item, onEdit, onComplete }: Props) {
         setIsRecording(false);
         if (recUri) saveRecording(item.id, recUri);
       }
-      if (Platform.OS === "web") {
-        // Set maxHeight to the ACTUAL card height BEFORE applying the collapsing style.
-        // If we set it after (or leave it at the 600 default), tall cards (>600px) would
-        // instantly snap from their real height to 600px the moment isCollapsing becomes
-        // true — that sudden layout jump confuses ReorderableList's Reanimated tracking
-        // and produces the scroll-to-card-42 bug.
-        maxHeightAnim.setValue(cardHeightRef.current);
-        // Now safe to activate the outer wrapper style (maxHeight == content height → no jump).
-        setIsCollapsing(true);
-        // Notify parent so it can scroll to this card's top if the user was deep inside it.
-        onComplete?.();
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: true,
-        }).start(({ finished }) => {
-          if (!finished) return;
-          // maxHeightAnim is already at the correct starting value; animate to 0.
-          Animated.timing(maxHeightAnim, {
-            toValue: 0,
-            duration: 450,
-            easing: Easing.out(Easing.quad),
-            useNativeDriver: false,
-          }).start(({ finished: f2 }) => {
-            if (f2) {
-              setIsCollapsing(false);
-              setHidden(true);
-            }
-          });
-        });
-      } else {
-        // Native: scroll-compensate FIRST (mirrors the web branch) so completing the
-        // bottom of a tall card the user scrolled into doesn't make the list jump when
-        // it collapses. Previously onComplete only ran on web, so the Android app kept
-        // the jump bug even after the "fix".
-        onComplete?.();
-        // fade, then LayoutAnimation collapses the height natively
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: true,
-        }).start(({ finished }) => {
-          if (finished) {
-            LayoutAnimation.configureNext({
-              duration: 350,
-              update: { type: LayoutAnimation.Types.easeInEaseOut },
-            });
-            setHidden(true);
-          }
-        });
-      }
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 600,
+        useNativeDriver: true,
+      }).start(({ finished }) => {
+        if (finished) {
+          setHidden(true);
+          onFadeComplete?.(item.id);
+        }
+      });
     } else if (!isDone) {
       fadeAnim.setValue(1);
-      maxHeightAnim.setValue(600);
-      setIsCollapsing(false);
       setHidden(false);
     }
     prevIsDoneRef.current = isDone;
@@ -331,24 +272,11 @@ export function DhikrCard({ item, onEdit, onComplete }: Props) {
     deleteRecording(item.id);
   };
 
-  const handleShare = async () => {
-    const line = "━━━━━━━━━━━━━━━━━━━━━━";
-    const msg = `${line}\n\n( ${item.text} )\n\n${line}\n📲 حمّل التطبيق:\nhttps://play.google.com/store/apps/details?id=com.adhkar.morningevening`;
-    try { await Share.share({ message: msg }); } catch {}
-  };
+  if (hidden) return <View style={{ height: 0 }} />;
 
-  if (hidden) return <View style={{ height: 0, overflow: "hidden" }} />;
-
-  // Outer wrapper: on web, handles maxHeight collapse WITHOUT transform/opacity so no stacking context.
-  // On native, outer has no style (LayoutAnimation collapses the layout naturally).
-  // Inner Animated.View: fade + scale animation on both platforms.
   return (
-    <Animated.View
-      onLayout={(e) => { cardHeightRef.current = e.nativeEvent.layout.height; }}
-      style={Platform.OS === "web" && isCollapsing ? { maxHeight: maxHeightAnim, overflow: "hidden" } : undefined}
-    >
-      <Animated.View style={{ transform: [{ scale: scaleAnim }], opacity: fadeAnim }}>
-          <Pressable
+    <Animated.View style={{ transform: [{ scale: scaleAnim }], opacity: fadeAnim }}>
+      <Pressable
         onPress={handlePress}
         style={[
           styles.card,
@@ -364,16 +292,14 @@ export function DhikrCard({ item, onEdit, onComplete }: Props) {
           },
         ]}
       >
-        <View style={styles.cardTopRow}>
-          <TouchableOpacity
-            onPressIn={drag}
-            style={styles.dragHandle}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            accessibilityLabel="اسحب لإعادة ترتيب الذكر"
-          >
-            <Icon name="more-vertical" size={18} color={mutedC} />
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          onLongPress={drag}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          style={styles.dragHandle}
+          activeOpacity={0.5}
+        >
+          <Icon name="more-vertical" size={18} color={mutedC} />
+        </TouchableOpacity>
 
         <Text
           selectable={false}
@@ -457,13 +383,6 @@ export function DhikrCard({ item, onEdit, onComplete }: Props) {
               </TouchableOpacity>
             )}
             <TouchableOpacity
-              onPress={handleShare}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              style={styles.actionBtn}
-            >
-              <Icon name="share-2" size={14} color={mutedC} />
-            </TouchableOpacity>
-            <TouchableOpacity
               onPress={() => onEdit(item)}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               style={styles.actionBtn}
@@ -504,7 +423,6 @@ export function DhikrCard({ item, onEdit, onComplete }: Props) {
           </View>
         )}
       </Pressable>
-      </Animated.View>
     </Animated.View>
   );
 }
@@ -512,22 +430,23 @@ export function DhikrCard({ item, onEdit, onComplete }: Props) {
 const styles = StyleSheet.create({
   card: {
     borderRadius: 14,
+    marginBottom: 20,
     overflow: "hidden",
-    paddingBottom: 16,
-    marginBottom: 28,
+    position: "relative",
   },
-  cardTopRow: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    paddingHorizontal: 6,
-    paddingTop: 4,
+  dragHandle: {
+    position: "absolute",
+    top: 6,
+    left: 6,
+    zIndex: 5,
+    padding: 4,
   },
   dhikrText: {
     fontFamily: Platform.OS === "ios" ? "System" : undefined,
     textAlign: "center",
     writingDirection: "rtl",
     paddingHorizontal: 16,
-    paddingTop: 4,
+    paddingTop: 18,
     paddingBottom: 14,
     lineHeight: 34,
   },
@@ -543,13 +462,6 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  dragHandle: {
-    width: 30,
-    height: 30,
-    borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
   },
