@@ -459,7 +459,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     writingDirection: "rtl",
     paddingHorizontal: 16,
-    paddingTop: 18,
+    paddingTop: 30,
     paddingBottom: 14,
     lineHeight: 34,
   },
