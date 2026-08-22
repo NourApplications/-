@@ -20,7 +20,7 @@
     },
     "android": {
       "package": "com.adhkar.morningevening",
-      "versionCode": 85,
+      "versionCode": 100,
       "resizeableActivity": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
@@ -31,9 +31,7 @@
         "android.permission.RECORD_AUDIO",
         "android.permission.VIBRATE",
         "android.permission.MODIFY_AUDIO_SETTINGS"
-      ],
-      "enableProguardInReleaseBuilds": true,
-      "enableShrinkResourcesInReleaseBuilds": true
+      ]
     },
     "web": {
       "favicon": "./assets/images/icon.png"
@@ -61,6 +59,15 @@
         "expo-av",
         {
           "microphonePermission": "يحتاج التطبيق إلى الميكروفون لتسجيل صوتك مع الأذكار"
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableMinifyInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true
+          }
         }
       ]
     ],
