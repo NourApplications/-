@@ -23,14 +23,21 @@ import {
 import { Icon } from "@/components/Icon";
 import { HistoryModal } from "@/components/HistoryModal";
 
-const COLOR_OPTIONS: { key: BgColorKey; dayColor: string; nightColor: string; label: string }[] = [
+const COLOR_OPTIONS: {
+  key: BgColorKey;
+  dayColor: string;
+  nightColor: string;
+  label: string;
+}[] = [
   { key: "blue", dayColor: "#DCEEFC", nightColor: "#0E1A2E", label: "أزرق" },
   { key: "white", dayColor: "#FFFFFF", nightColor: "#1C1F2E", label: "أبيض" },
   { key: "cream", dayColor: "#FBF3E0", nightColor: "#221C0E", label: "كريمي" },
   { key: "mint", dayColor: "#E8F5E8", nightColor: "#0E1F0E", label: "أخضر" },
 ];
 
-function pad(n: number) { return n.toString().padStart(2, "0"); }
+function pad(n: number) {
+  return n.toString().padStart(2, "0");
+}
 
 function to12h(hour24: number): string {
   if (hour24 === 0) return "12 ص";
@@ -66,11 +73,25 @@ export function ControlBar() {
 
   const autoScrollDone = useRef(false);
   useEffect(() => {
-    if (!autoScrollDone.current && contentW > 0 && scrollViewW > 0 && contentW > scrollViewW + 6) {
+    if (
+      !autoScrollDone.current &&
+      contentW > 0 &&
+      scrollViewW > 0 &&
+      contentW > scrollViewW + 6
+    ) {
       autoScrollDone.current = true;
-      const t1 = setTimeout(() => barScrollRef.current?.scrollToEnd({ animated: true }), 400);
-      const t2 = setTimeout(() => barScrollRef.current?.scrollTo({ x: 0, animated: true }), 1200);
-      return () => { clearTimeout(t1); clearTimeout(t2); };
+      const t1 = setTimeout(
+        () => barScrollRef.current?.scrollToEnd({ animated: true }),
+        400,
+      );
+      const t2 = setTimeout(
+        () => barScrollRef.current?.scrollTo({ x: 0, animated: true }),
+        1200,
+      );
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+      };
     }
   }, [contentW, scrollViewW]);
 
@@ -92,7 +113,6 @@ export function ControlBar() {
   const showStartHint = canScroll && scrollX > 6;
   const showEndHint = canScroll && scrollX < maxScroll - 6;
 
-
   const todayMorning = dailyStats.morningCount;
   const todayEvening = dailyStats.eveningCount;
 
@@ -108,129 +128,187 @@ export function ControlBar() {
           },
         ]}
       >
-
         <View style={styles.scrollWrap}>
-        <ScrollView
-          ref={barScrollRef}
-          horizontal={!isTablet}
-          showsHorizontalScrollIndicator={false}
-          scrollEnabled={!isTablet}
-          onLayout={(e) => setScrollViewW(e.nativeEvent.layout.width)}
-          onContentSizeChange={(w) => setContentW(w)}
-          onScroll={(e) => setScrollX(e.nativeEvent.contentOffset.x)}
-          scrollEventThrottle={32}
-          contentContainerStyle={[styles.row, isTablet && styles.rowTablet, !isTablet && styles.rowPadded]}
-        >
-          <TouchableOpacity
-            onPress={() => updateSettings({ theme: theme === "day" ? "night" : "day" })}
-            style={[styles.iconBtn, { borderColor: borderC }]}
-            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+          <ScrollView
+            ref={barScrollRef}
+            horizontal={!isTablet}
+            showsHorizontalScrollIndicator={false}
+            scrollEnabled={!isTablet}
+            onLayout={(e) => setScrollViewW(e.nativeEvent.layout.width)}
+            onContentSizeChange={(w) => setContentW(w)}
+            onScroll={(e) => setScrollX(e.nativeEvent.contentOffset.x)}
+            scrollEventThrottle={32}
+            contentContainerStyle={[
+              styles.row,
+              isTablet && styles.rowTablet,
+              !isTablet && styles.rowPadded,
+            ]}
           >
-            <Icon name={theme === "day" ? "moon" : "sun"} size={18} color={textC} />
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() =>
+                updateSettings({ theme: theme === "day" ? "night" : "day" })
+              }
+              style={[styles.iconBtn, { borderColor: borderC }]}
+              hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+            >
+              <Icon
+                name={theme === "day" ? "moon" : "sun"}
+                size={18}
+                color={textC}
+              />
+            </TouchableOpacity>
 
-          <View style={[styles.divider, { backgroundColor: borderC }]} />
+            <View style={[styles.divider, { backgroundColor: borderC }]} />
 
-          {COLOR_OPTIONS.map((opt) => {
-            const circleColor = theme === "day" ? opt.dayColor : opt.nightColor;
-            const isSelected = bgColor === opt.key;
-            return (
-              <TouchableOpacity
-                key={opt.key}
-                onPress={() => updateSettings({ bgColor: opt.key })}
+            {COLOR_OPTIONS.map((opt) => {
+              const circleColor =
+                theme === "day" ? opt.dayColor : opt.nightColor;
+              const isSelected = bgColor === opt.key;
+              return (
+                <TouchableOpacity
+                  key={opt.key}
+                  onPress={() => updateSettings({ bgColor: opt.key })}
+                  style={[
+                    styles.colorCircle,
+                    {
+                      backgroundColor: circleColor,
+                      borderColor: isSelected ? primaryC : borderC,
+                      borderWidth: isSelected ? 2.5 : 1,
+                    },
+                  ]}
+                />
+              );
+            })}
+
+            <View style={[styles.divider, { backgroundColor: borderC }]} />
+
+            <TouchableOpacity
+              onPress={isPlayingAll ? stopSpeaking : speakAll}
+              style={[
+                styles.iconBtn,
+                {
+                  borderColor: isPlayingAll ? primaryC : borderC,
+                  backgroundColor: isPlayingAll
+                    ? primaryC + "22"
+                    : "transparent",
+                },
+              ]}
+              hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+            >
+              <Icon
+                name={isPlayingAll ? "pause" : "headphones"}
+                size={18}
+                color={isPlayingAll ? primaryC : textC}
+              />
+            </TouchableOpacity>
+
+            <View style={[styles.divider, { backgroundColor: borderC }]} />
+
+            <TouchableOpacity
+              onPress={() =>
+                updateSettings({ fontSize: Math.max(14, fontSize - 2) })
+              }
+              style={[styles.iconBtn, { borderColor: borderC }]}
+              hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+            >
+              <Text
                 style={[
-                  styles.colorCircle,
+                  styles.fontBtnText,
                   {
-                    backgroundColor: circleColor,
-                    borderColor: isSelected ? primaryC : borderC,
-                    borderWidth: isSelected ? 2.5 : 1,
+                    color: textC,
+                    fontSize: 16,
+                    lineHeight: 18,
+                    includeFontPadding: false,
                   },
                 ]}
-              />
-            );
-          })}
+              >
+                ب
+              </Text>
+            </TouchableOpacity>
 
-          <View style={[styles.divider, { backgroundColor: borderC }]} />
+            <TouchableOpacity
+              onPress={() =>
+                updateSettings({ fontSize: Math.min(28, fontSize + 2) })
+              }
+              style={[styles.iconBtn, { borderColor: borderC }]}
+              hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+            >
+              <Text
+                style={[
+                  styles.fontBtnText,
+                  {
+                    color: textC,
+                    fontSize: 24,
+                    lineHeight: 26,
+                    includeFontPadding: false,
+                  },
+                ]}
+              >
+                ب
+              </Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={isPlayingAll ? stopSpeaking : speakAll}
-            style={[
-              styles.iconBtn,
-              {
-                borderColor: isPlayingAll ? primaryC : borderC,
-                backgroundColor: isPlayingAll ? primaryC + "22" : "transparent",
-              },
-            ]}
-            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
-          >
-            <Icon name={isPlayingAll ? "pause" : "headphones"} size={18} color={isPlayingAll ? primaryC : textC} />
-          </TouchableOpacity>
+            <View style={[styles.divider, { backgroundColor: borderC }]} />
 
-          <View style={[styles.divider, { backgroundColor: borderC }]} />
+            <TouchableOpacity
+              onPress={() => resetCategory(activeCategory)}
+              style={[styles.iconBtn, { borderColor: borderC }]}
+              hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+            >
+              <Icon name="refresh-cw" size={16} color={mutedC} />
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={() => updateSettings({ fontSize: Math.max(14, fontSize - 2) })}
-            style={[styles.iconBtn, { borderColor: borderC }]}
-            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
-          >
-            <Text style={[styles.fontBtnText, { color: textC, fontSize: 16, lineHeight: 18, includeFontPadding: false }]}>ب</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setSettingsOpen(true)}
+              style={[styles.iconBtn, { borderColor: borderC }]}
+              hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+            >
+              <Icon name="settings" size={16} color={mutedC} />
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={() => updateSettings({ fontSize: Math.min(28, fontSize + 2) })}
-            style={[styles.iconBtn, { borderColor: borderC }]}
-            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
-          >
-            <Text style={[styles.fontBtnText, { color: textC, fontSize: 24, lineHeight: 26, includeFontPadding: false }]}>ب</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() =>
+                Share.share({
+                  title: "أذكار الصباح والمساء",
+                  message:
+                    "تطبيق أذكار الصباح والمساء 🤲\nاحرص على ذكر الله صباحاً ومساءً\n\nحمّل التطبيق:\nhttps://play.google.com/store/apps/details?id=com.adhkar.morningevening",
+                })
+              }
+              style={[styles.iconBtn, { borderColor: borderC }]}
+              hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+            >
+              <Icon name="gift" size={16} color={mutedC} />
+            </TouchableOpacity>
 
-          <View style={[styles.divider, { backgroundColor: borderC }]} />
-
-          <TouchableOpacity
-            onPress={() => resetCategory(activeCategory)}
-            style={[styles.iconBtn, { borderColor: borderC }]}
-            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
-          >
-            <Icon name="refresh-cw" size={16} color={mutedC} />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => setSettingsOpen(true)}
-            style={[styles.iconBtn, { borderColor: borderC }]}
-            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
-          >
-            <Icon name="settings" size={16} color={mutedC} />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() =>
-              Share.share({
-                title: "أذكار الصباح والمساء",
-                message:
-                  "تطبيق أذكار الصباح والمساء 🤲\nاحرص على ذكر الله صباحاً ومساءً\n\nحمّل التطبيق:\nhttps://play.google.com/store/apps/details?id=com.adhkar.morningevening",
-              })
-            }
-            style={[styles.iconBtn, { borderColor: borderC }]}
-            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
-          >
-            <Icon name="gift" size={16} color={mutedC} />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => setHistoryOpen(true)}
-            style={[styles.iconBtn, { borderColor: borderC }]}
-            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
-          >
-            <Icon name="calendar" size={16} color={mutedC} />
-          </TouchableOpacity>
-        </ScrollView>
+            <TouchableOpacity
+              onPress={() => setHistoryOpen(true)}
+              style={[styles.iconBtn, { borderColor: borderC }]}
+              hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+            >
+              <Icon name="calendar" size={16} color={mutedC} />
+            </TouchableOpacity>
+          </ScrollView>
           {showStartHint && (
-            <View pointerEvents="none" style={[styles.scrollHint, styles.scrollHintLeft, { backgroundColor: barBg }]}>
+            <View
+              pointerEvents="none"
+              style={[
+                styles.scrollHint,
+                styles.scrollHintLeft,
+                { backgroundColor: barBg },
+              ]}
+            >
               <Icon name="chevron-left" size={16} color={primaryC} />
             </View>
           )}
           {showEndHint && (
-            <View pointerEvents="none" style={[styles.scrollHint, styles.scrollHintRight, { backgroundColor: barBg }]}>
+            <View
+              pointerEvents="none"
+              style={[
+                styles.scrollHint,
+                styles.scrollHintRight,
+                { backgroundColor: barBg },
+              ]}
+            >
               <Icon name="chevron-right" size={16} color={primaryC} />
             </View>
           )}
@@ -239,20 +317,46 @@ export function ControlBar() {
         {(() => {
           const today = new Date();
           const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-          const todayRecord = completionHistory.find((r) => r.date === todayKey);
+          const todayRecord = completionHistory.find(
+            (r) => r.date === todayKey,
+          );
           const morningDone = todayRecord?.morning ?? false;
           const eveningDone = todayRecord?.evening ?? false;
           return (
             <View style={styles.todayWidget}>
-              <View style={[styles.todayItem, { backgroundColor: morningDone ? primaryC + "18" : borderC + "44" }]}>
+              <View
+                style={[
+                  styles.todayItem,
+                  {
+                    backgroundColor: morningDone
+                      ? primaryC + "18"
+                      : borderC + "44",
+                  },
+                ]}
+              >
                 <Text style={styles.todayEmoji}>☀️</Text>
-                <Text style={[styles.todayItemText, { color: morningDone ? primaryC : mutedC }]}>
+                <Text
+                  style={[
+                    styles.todayItemText,
+                    { color: morningDone ? primaryC : mutedC },
+                  ]}
+                >
                   {morningDone ? "مكتمل" : "لم يكتمل"}
                 </Text>
               </View>
-              <View style={[styles.todayItem, { backgroundColor: eveningDone ? "#000000" : "#666666" }]}>
+              <View
+                style={[
+                  styles.todayItem,
+                  { backgroundColor: eveningDone ? "#000000" : "#666666" },
+                ]}
+              >
                 <Icon name="moon-filled" size={13} color="#FFFFFF" />
-                <Text style={[styles.todayItemText, { color: eveningDone ? "#A5B4FC" : "#FFFFFF" }]}>
+                <Text
+                  style={[
+                    styles.todayItemText,
+                    { color: eveningDone ? "#A5B4FC" : "#FFFFFF" },
+                  ]}
+                >
                   {eveningDone ? "مكتمل" : "لم يكتمل"}
                 </Text>
               </View>
@@ -267,105 +371,233 @@ export function ControlBar() {
         transparent
         onRequestClose={() => setSettingsOpen(false)}
       >
-        <Pressable style={styles.modalOverlay} onPress={() => setSettingsOpen(false)}>
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setSettingsOpen(false)}
+        >
           <Pressable
             style={[styles.modalSheet, { backgroundColor: modalBg }]}
             onPress={(e) => e.stopPropagation()}
           >
             <View style={[styles.modalHandle, { backgroundColor: borderC }]} />
             <View style={[styles.modalHeader, { borderBottomColor: borderC }]}>
-              <Text style={[styles.modalTitle, { color: textC }]}>الإعدادات</Text>
+              <Text style={[styles.modalTitle, { color: textC }]}>
+                الإعدادات
+              </Text>
               <TouchableOpacity onPress={() => setSettingsOpen(false)}>
                 <Icon name="x" size={22} color={mutedC} />
               </TouchableOpacity>
             </View>
 
             <View style={{ paddingBottom: insets.bottom + 8 }}>
-              <View style={[styles.section, { backgroundColor: sectionBg, borderColor: borderC }]}>
-                <Text style={[styles.sectionTitle, { color: mutedC }]}>التذكيرات اليومية</Text>
-
-                <View style={[styles.settingRow, { borderBottomColor: borderC }]}>
+              <View
+                style={[
+                  styles.section,
+                  { backgroundColor: sectionBg, borderColor: borderC },
+                ]}
+              >
+                <Text style={[styles.sectionTitle, { color: mutedC }]}>
+                  القارئ الذاتي
+                </Text>
+                <View style={[styles.settingRow, { borderBottomWidth: 0 }]}>
                   <View style={styles.settingLabel}>
-                    <Text style={[styles.settingText, { color: textC }]}>تفعيل الإشعارات</Text>
+                    <Text style={[styles.settingText, { color: textC }]}>
+                      صوت رجل تلقائيًا
+                    </Text>
+                    <Text style={[styles.settingHint, { color: mutedC }]}>
+                      يُفضّل صوتًا رجاليًا عربيًا عند توفره على الجهاز
+                    </Text>
+                  </View>
+                  <Switch
+                    value={settings.preferredVoiceGender === "male"}
+                    onValueChange={(enabled) =>
+                      updateSettings({
+                        preferredVoiceGender: enabled ? "male" : "system",
+                      })
+                    }
+                    trackColor={{ false: borderC, true: primaryC + "88" }}
+                    thumbColor={
+                      settings.preferredVoiceGender === "male"
+                        ? primaryC
+                        : mutedC
+                    }
+                  />
+                </View>
+              </View>
+
+              <View
+                style={[
+                  styles.section,
+                  { backgroundColor: sectionBg, borderColor: borderC },
+                ]}
+              >
+                <Text style={[styles.sectionTitle, { color: mutedC }]}>
+                  التذكيرات اليومية
+                </Text>
+
+                <View
+                  style={[styles.settingRow, { borderBottomColor: borderC }]}
+                >
+                  <View style={styles.settingLabel}>
+                    <Text style={[styles.settingText, { color: textC }]}>
+                      تفعيل الإشعارات
+                    </Text>
                   </View>
                   <Switch
                     value={settings.notificationsEnabled}
-                    onValueChange={(v) => updateSettings({ notificationsEnabled: v })}
+                    onValueChange={(v) =>
+                      updateSettings({ notificationsEnabled: v })
+                    }
                     trackColor={{ false: borderC, true: primaryC + "88" }}
-                    thumbColor={settings.notificationsEnabled ? primaryC : mutedC}
+                    thumbColor={
+                      settings.notificationsEnabled ? primaryC : mutedC
+                    }
                   />
                 </View>
 
                 {settings.notificationsEnabled && (
                   <>
-                    <View style={[styles.settingRow, { borderBottomColor: borderC }]}>
+                    <View
+                      style={[
+                        styles.settingRow,
+                        { borderBottomColor: borderC },
+                      ]}
+                    >
                       <View style={styles.settingLabel}>
-                        <Text style={[styles.settingText, { color: textC }]}>🌅 وقت أذكار الصباح</Text>
+                        <Text style={[styles.settingText, { color: textC }]}>
+                          🌅 وقت أذكار الصباح
+                        </Text>
                       </View>
                       <View style={styles.timeControl}>
                         <TouchableOpacity
-                          onPress={() => updateSettings({ morningNotifHour: (settings.morningNotifHour + 1) % 24 })}
+                          onPress={() =>
+                            updateSettings({
+                              morningNotifHour:
+                                (settings.morningNotifHour + 1) % 24,
+                            })
+                          }
                           style={[styles.timeBtn, { borderColor: borderC }]}
                         >
                           <Icon name="chevron-up" size={14} color={primaryC} />
                         </TouchableOpacity>
-                        <Text style={[styles.timeText, { color: textC }]}>{to12h(settings.morningNotifHour)}</Text>
+                        <Text style={[styles.timeText, { color: textC }]}>
+                          {to12h(settings.morningNotifHour)}
+                        </Text>
                         <TouchableOpacity
-                          onPress={() => updateSettings({ morningNotifHour: (settings.morningNotifHour - 1 + 24) % 24 })}
+                          onPress={() =>
+                            updateSettings({
+                              morningNotifHour:
+                                (settings.morningNotifHour - 1 + 24) % 24,
+                            })
+                          }
                           style={[styles.timeBtn, { borderColor: borderC }]}
                         >
-                          <Icon name="chevron-down" size={14} color={primaryC} />
+                          <Icon
+                            name="chevron-down"
+                            size={14}
+                            color={primaryC}
+                          />
                         </TouchableOpacity>
                       </View>
                       <View style={styles.timeControl}>
                         <TouchableOpacity
-                          onPress={() => updateSettings({ morningNotifMinute: (settings.morningNotifMinute + 5) % 60 })}
+                          onPress={() =>
+                            updateSettings({
+                              morningNotifMinute:
+                                (settings.morningNotifMinute + 5) % 60,
+                            })
+                          }
                           style={[styles.timeBtn, { borderColor: borderC }]}
                         >
                           <Icon name="chevron-up" size={14} color={primaryC} />
                         </TouchableOpacity>
-                        <Text style={[styles.timeText, { color: textC }]}>{pad(settings.morningNotifMinute)} د</Text>
+                        <Text style={[styles.timeText, { color: textC }]}>
+                          {pad(settings.morningNotifMinute)} د
+                        </Text>
                         <TouchableOpacity
-                          onPress={() => updateSettings({ morningNotifMinute: (settings.morningNotifMinute - 5 + 60) % 60 })}
+                          onPress={() =>
+                            updateSettings({
+                              morningNotifMinute:
+                                (settings.morningNotifMinute - 5 + 60) % 60,
+                            })
+                          }
                           style={[styles.timeBtn, { borderColor: borderC }]}
                         >
-                          <Icon name="chevron-down" size={14} color={primaryC} />
+                          <Icon
+                            name="chevron-down"
+                            size={14}
+                            color={primaryC}
+                          />
                         </TouchableOpacity>
                       </View>
                     </View>
 
                     <View style={[styles.settingRow]}>
                       <View style={styles.settingLabel}>
-                        <Text style={[styles.settingText, { color: textC }]}>🌙 وقت أذكار المساء</Text>
+                        <Text style={[styles.settingText, { color: textC }]}>
+                          🌙 وقت أذكار المساء
+                        </Text>
                       </View>
                       <View style={styles.timeControl}>
                         <TouchableOpacity
-                          onPress={() => updateSettings({ eveningNotifHour: (settings.eveningNotifHour + 1) % 24 })}
+                          onPress={() =>
+                            updateSettings({
+                              eveningNotifHour:
+                                (settings.eveningNotifHour + 1) % 24,
+                            })
+                          }
                           style={[styles.timeBtn, { borderColor: borderC }]}
                         >
                           <Icon name="chevron-up" size={14} color={primaryC} />
                         </TouchableOpacity>
-                        <Text style={[styles.timeText, { color: textC }]}>{to12h(settings.eveningNotifHour)}</Text>
+                        <Text style={[styles.timeText, { color: textC }]}>
+                          {to12h(settings.eveningNotifHour)}
+                        </Text>
                         <TouchableOpacity
-                          onPress={() => updateSettings({ eveningNotifHour: (settings.eveningNotifHour - 1 + 24) % 24 })}
+                          onPress={() =>
+                            updateSettings({
+                              eveningNotifHour:
+                                (settings.eveningNotifHour - 1 + 24) % 24,
+                            })
+                          }
                           style={[styles.timeBtn, { borderColor: borderC }]}
                         >
-                          <Icon name="chevron-down" size={14} color={primaryC} />
+                          <Icon
+                            name="chevron-down"
+                            size={14}
+                            color={primaryC}
+                          />
                         </TouchableOpacity>
                       </View>
                       <View style={styles.timeControl}>
                         <TouchableOpacity
-                          onPress={() => updateSettings({ eveningNotifMinute: (settings.eveningNotifMinute + 5) % 60 })}
+                          onPress={() =>
+                            updateSettings({
+                              eveningNotifMinute:
+                                (settings.eveningNotifMinute + 5) % 60,
+                            })
+                          }
                           style={[styles.timeBtn, { borderColor: borderC }]}
                         >
                           <Icon name="chevron-up" size={14} color={primaryC} />
                         </TouchableOpacity>
-                        <Text style={[styles.timeText, { color: textC }]}>{pad(settings.eveningNotifMinute)} د</Text>
+                        <Text style={[styles.timeText, { color: textC }]}>
+                          {pad(settings.eveningNotifMinute)} د
+                        </Text>
                         <TouchableOpacity
-                          onPress={() => updateSettings({ eveningNotifMinute: (settings.eveningNotifMinute - 5 + 60) % 60 })}
+                          onPress={() =>
+                            updateSettings({
+                              eveningNotifMinute:
+                                (settings.eveningNotifMinute - 5 + 60) % 60,
+                            })
+                          }
                           style={[styles.timeBtn, { borderColor: borderC }]}
                         >
-                          <Icon name="chevron-down" size={14} color={primaryC} />
+                          <Icon
+                            name="chevron-down"
+                            size={14}
+                            color={primaryC}
+                          />
                         </TouchableOpacity>
                       </View>
                     </View>
@@ -373,25 +605,58 @@ export function ControlBar() {
                 )}
               </View>
 
-              <View style={[styles.section, { backgroundColor: sectionBg, borderColor: borderC }]}>
-                <Text style={[styles.sectionTitle, { color: mutedC }]}>أذكار تذكيرية</Text>
+              <View
+                style={[
+                  styles.section,
+                  { backgroundColor: sectionBg, borderColor: borderC },
+                ]}
+              >
+                <Text style={[styles.sectionTitle, { color: mutedC }]}>
+                  أذكار تذكيرية
+                </Text>
 
-                <View style={[styles.settingRow, { borderBottomColor: borderC, borderBottomWidth: settings.dhikrReminderEnabled ? 1 : 0 }]}>
+                <View
+                  style={[
+                    styles.settingRow,
+                    {
+                      borderBottomColor: borderC,
+                      borderBottomWidth: settings.dhikrReminderEnabled ? 1 : 0,
+                    },
+                  ]}
+                >
                   <View style={styles.settingLabel}>
-                    <Text style={[styles.settingText, { color: textC }]}>تفعيل الأذكار التذكيرية</Text>
+                    <Text style={[styles.settingText, { color: textC }]}>
+                      تفعيل الأذكار التذكيرية
+                    </Text>
                   </View>
                   <Switch
                     value={settings.dhikrReminderEnabled}
-                    onValueChange={(v) => updateSettings({ dhikrReminderEnabled: v })}
+                    onValueChange={(v) =>
+                      updateSettings({ dhikrReminderEnabled: v })
+                    }
                     trackColor={{ false: borderC, true: primaryC + "88" }}
-                    thumbColor={settings.dhikrReminderEnabled ? primaryC : mutedC}
+                    thumbColor={
+                      settings.dhikrReminderEnabled ? primaryC : mutedC
+                    }
                   />
                 </View>
 
                 {settings.dhikrReminderEnabled && (
                   <>
-                    <View style={[styles.settingRow, { borderBottomColor: borderC, flexDirection: "column", alignItems: "flex-end", gap: 6 }]}>
-                      <Text style={[styles.settingText, { color: textC }]}>كل كم يظهر الذكر؟</Text>
+                    <View
+                      style={[
+                        styles.settingRow,
+                        {
+                          borderBottomColor: borderC,
+                          flexDirection: "column",
+                          alignItems: "flex-end",
+                          gap: 6,
+                        },
+                      ]}
+                    >
+                      <Text style={[styles.settingText, { color: textC }]}>
+                        كل كم يظهر الذكر؟
+                      </Text>
                       <View style={styles.intervalBtns}>
                         {[
                           { label: "٣٠ دقيقة", value: 30 },
@@ -399,20 +664,32 @@ export function ControlBar() {
                           { label: "ساعتين", value: 120 },
                           { label: "٣ ساعات", value: 180 },
                         ].map((opt) => {
-                          const isSelected = settings.dhikrReminderIntervalMinutes === opt.value;
+                          const isSelected =
+                            settings.dhikrReminderIntervalMinutes === opt.value;
                           return (
                             <TouchableOpacity
                               key={opt.value}
-                              onPress={() => updateSettings({ dhikrReminderIntervalMinutes: opt.value })}
+                              onPress={() =>
+                                updateSettings({
+                                  dhikrReminderIntervalMinutes: opt.value,
+                                })
+                              }
                               style={[
                                 styles.intervalBtn,
                                 {
-                                  backgroundColor: isSelected ? primaryC : "transparent",
+                                  backgroundColor: isSelected
+                                    ? primaryC
+                                    : "transparent",
                                   borderColor: isSelected ? primaryC : borderC,
                                 },
                               ]}
                             >
-                              <Text style={[styles.intervalBtnText, { color: isSelected ? "#fff" : textC }]}>
+                              <Text
+                                style={[
+                                  styles.intervalBtnText,
+                                  { color: isSelected ? "#fff" : textC },
+                                ]}
+                              >
                                 {opt.label}
                               </Text>
                             </TouchableOpacity>
@@ -421,57 +698,100 @@ export function ControlBar() {
                       </View>
                     </View>
 
-                    <View style={[styles.settingRow, { borderBottomColor: borderC }]}>
+                    <View
+                      style={[
+                        styles.settingRow,
+                        { borderBottomColor: borderC },
+                      ]}
+                    >
                       <View style={styles.settingLabel}>
-                        <Text style={[styles.settingText, { color: textC }]}>⏰ من الساعة</Text>
+                        <Text style={[styles.settingText, { color: textC }]}>
+                          ⏰ من الساعة
+                        </Text>
                       </View>
                       <View style={styles.timeControl}>
                         <TouchableOpacity
-                          onPress={() => updateSettings({ dhikrReminderStartHour: (settings.dhikrReminderStartHour + 1) % 24 })}
+                          onPress={() =>
+                            updateSettings({
+                              dhikrReminderStartHour:
+                                (settings.dhikrReminderStartHour + 1) % 24,
+                            })
+                          }
                           style={[styles.timeBtn, { borderColor: borderC }]}
                         >
                           <Icon name="chevron-up" size={14} color={primaryC} />
                         </TouchableOpacity>
-                        <Text style={[styles.timeText, { color: textC }]}>{to12h(settings.dhikrReminderStartHour)}</Text>
+                        <Text style={[styles.timeText, { color: textC }]}>
+                          {to12h(settings.dhikrReminderStartHour)}
+                        </Text>
                         <TouchableOpacity
-                          onPress={() => updateSettings({ dhikrReminderStartHour: (settings.dhikrReminderStartHour - 1 + 24) % 24 })}
+                          onPress={() =>
+                            updateSettings({
+                              dhikrReminderStartHour:
+                                (settings.dhikrReminderStartHour - 1 + 24) % 24,
+                            })
+                          }
                           style={[styles.timeBtn, { borderColor: borderC }]}
                         >
-                          <Icon name="chevron-down" size={14} color={primaryC} />
+                          <Icon
+                            name="chevron-down"
+                            size={14}
+                            color={primaryC}
+                          />
                         </TouchableOpacity>
                       </View>
                     </View>
 
                     <View style={[styles.settingRow, { borderBottomWidth: 0 }]}>
                       <View style={styles.settingLabel}>
-                        <Text style={[styles.settingText, { color: textC }]}>🔕 حتى الساعة</Text>
+                        <Text style={[styles.settingText, { color: textC }]}>
+                          🔕 حتى الساعة
+                        </Text>
                       </View>
                       <View style={styles.timeControl}>
                         <TouchableOpacity
-                          onPress={() => updateSettings({ dhikrReminderEndHour: (settings.dhikrReminderEndHour + 1) % 24 })}
+                          onPress={() =>
+                            updateSettings({
+                              dhikrReminderEndHour:
+                                (settings.dhikrReminderEndHour + 1) % 24,
+                            })
+                          }
                           style={[styles.timeBtn, { borderColor: borderC }]}
                         >
                           <Icon name="chevron-up" size={14} color={primaryC} />
                         </TouchableOpacity>
-                        <Text style={[styles.timeText, { color: textC }]}>{to12h(settings.dhikrReminderEndHour)}</Text>
+                        <Text style={[styles.timeText, { color: textC }]}>
+                          {to12h(settings.dhikrReminderEndHour)}
+                        </Text>
                         <TouchableOpacity
-                          onPress={() => updateSettings({ dhikrReminderEndHour: (settings.dhikrReminderEndHour - 1 + 24) % 24 })}
+                          onPress={() =>
+                            updateSettings({
+                              dhikrReminderEndHour:
+                                (settings.dhikrReminderEndHour - 1 + 24) % 24,
+                            })
+                          }
                           style={[styles.timeBtn, { borderColor: borderC }]}
                         >
-                          <Icon name="chevron-down" size={14} color={primaryC} />
+                          <Icon
+                            name="chevron-down"
+                            size={14}
+                            color={primaryC}
+                          />
                         </TouchableOpacity>
                       </View>
                     </View>
                   </>
                 )}
               </View>
-
             </View>
           </Pressable>
         </Pressable>
       </Modal>
 
-      <HistoryModal visible={historyOpen} onClose={() => setHistoryOpen(false)} />
+      <HistoryModal
+        visible={historyOpen}
+        onClose={() => setHistoryOpen(false)}
+      />
     </>
   );
 }
