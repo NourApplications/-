@@ -53,6 +53,7 @@ export interface AppSettings {
   dhikrReminderStartHour: number;
   dhikrReminderEndHour: number;
   selectedVoiceIdentifier: string | null;
+  preferredVoiceGender: "male" | "system";
 }
 
 export interface DailyStats {
@@ -825,6 +826,9 @@ const DEFAULT_SETTINGS: AppSettings = {
   dhikrReminderStartHour: 5,
   dhikrReminderEndHour: 23,
   selectedVoiceIdentifier: null,
+  // Prefer a male Arabic reader when the device exposes one. The user can
+  // revert to the device default from Settings at any time.
+  preferredVoiceGender: "male",
 };
 
 function todayString() {
@@ -868,19 +872,27 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const playbackGenRef = useRef(0);
 
   const getArabicVoice = async (): Promise<string | undefined> => {
-    // User-selected voice takes priority over auto-pick
+    // A voice deliberately chosen by the user always has priority.
     if (settings.selectedVoiceIdentifier != null) {
       return settings.selectedVoiceIdentifier;
     }
-    // No in-app selection: don't guess. Leaving voice undefined makes
-    // Speech.speak() use the OS's own currently-selected default TTS voice
-    // for the language — i.e. whatever the user already chose in Android's
-    // own Text-to-speech settings. Picking an index out of
-    // Speech.getAvailableVoicesAsync() (sorted alphabetically by
-    // identifier) is not reliable: that order does not necessarily match
-    // the "الصوت I / II / III / IV" order shown in Android's TTS voice
-    // picker, so an index-based guess can silently land on the wrong voice.
-    return undefined;
+
+    // Voice gender is not a standard field in expo-speech. Some Android and iOS
+    // engines expose it in the name/identifier, so use those explicit labels only
+    // instead of relying on an arbitrary array index.
+    if (settings.preferredVoiceGender !== "male") return undefined;
+    try {
+      const voices = await Speech.getAvailableVoicesAsync();
+      const maleArabicVoice = voices.find((voice) => {
+        const label = `${voice.name} ${voice.identifier}`.toLowerCase();
+        const isArabic = voice.language.toLowerCase().startsWith("ar");
+        return isArabic && /(male|man|masculine|رجل|ذكر)/i.test(label);
+      });
+      return maleArabicVoice?.identifier;
+    } catch {
+      // Keep the device's own Arabic default if the voice catalogue is unavailable.
+      return undefined;
+    }
   };
   // Tracks the date of the last completed reset so we can detect a day change
   // while the app is backgrounded and re-foregrounded (the cold-launch reset
@@ -1573,6 +1585,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           Speech.speak(dhikr.text, {
             language: "ar",
             voice: voiceId,
+            rate: 0.82,
+            pitch: settings.preferredVoiceGender === "male" ? 0.82 : 1,
             onDone: () => {
               if (gen !== playbackGenRef.current) return;
               if (!speakAllRef.current) {
@@ -1654,6 +1668,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           Speech.speak(text, {
             language: "ar",
             voice: voiceId,
+            rate: 0.82,
+            pitch: settings.preferredVoiceGender === "male" ? 0.82 : 1,
             onDone: () => {
               if (gen !== playbackGenRef.current) return;
               if (!ttsLoopRef.current) {
