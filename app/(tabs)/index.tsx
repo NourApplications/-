@@ -119,6 +119,20 @@ export default function MainScreen() {
     outputRange: [0, headerNaturalHeight],
   });
 
+  // When every dhikr in the active category has been completed and its cards
+  // have finished fading out, leave fullscreen/collapsed-header mode.
+  useEffect(() => {
+    if (!isLoaded || !headerCollapsed || all.length === 0) return;
+    if (!all.every((d) => d.currentCount === 0)) return;
+
+    // Give the card fade-out animation time to finish before restoring the UI.
+    const timer = setTimeout(() => {
+      toggleHeader();
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [isLoaded, headerCollapsed, all]);
+
   const doExport = async (category: "morning" | "evening") => {
     if (Platform.OS === "web") {
       Alert.alert("غير متاح", "مشاركة PDF تعمل على تطبيق الهاتف فقط.");
