@@ -16,6 +16,14 @@ jobs:
         with:
           node-version: 22
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install project dependencies
+        run: pnpm install --frozen-lockfile
+
       - name: Install EAS CLI
         run: npm install --global eas-cli
 
@@ -23,3 +31,4 @@ jobs:
         run: eas build --platform ios --profile production --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EAS_BUILD_NO_EXPO_GO_WARNING: "true"
